@@ -12,24 +12,72 @@ export const site = {
   instagram: "https://www.instagram.com/nailmonsterboston/",
   instagramHandle: "nailmonsterboston",
   facebook: "https://www.facebook.com/profile.php?id=100091497747918",
+  giftCardUrl:
+    "https://www.fresha.com/a/nail-monster-brookline-327-harvard-street-td3pja5r/gift-cards?pId=764868",
   hours: [
     { days: "Monday – Saturday", time: "10:30am – 7:30pm" },
     { days: "Sunday", time: "10:30am – 6:30pm" },
   ],
 };
 
-export const nav = [
-  { href: "/pricelist", label: "Price List" },
-  { href: "/manicure-pedicure", label: "Nail Services" },
-  { href: "/facial-spa", label: "Facial Spa" },
-  { href: "/eyelash-wax", label: "Eyelash / Wax" },
-  { href: "/faqs", label: "FAQs" },
-  { href: "/about-us", label: "About Us" },
-  { href: "/gallery", label: "Gallery" },
-  { href: "/reservation", label: "Reservation" },
-  { href: "/news", label: "News" },
-  { href: "/contact", label: "Contact" },
+export type NavLink = {
+  label: string;
+  href: string;
+  external?: boolean;
+};
+
+export type NavItem =
+  | ({ type: "link" } & NavLink)
+  | {
+      type: "dropdown";
+      label: string;
+      href?: string;
+      items: NavLink[];
+    };
+
+export const nav: NavItem[] = [
+  {
+    type: "dropdown",
+    label: "Price List",
+    href: "/pricelist",
+    items: [
+      { label: "Nail Services", href: "/pricelist" },
+      { label: "Facial Spa", href: "/facial-spa" },
+      { label: "Eyelash/ Wax", href: "/eyelash-wax" },
+    ],
+  },
+  {
+    type: "link",
+    label: "Gift Card",
+    href: site.giftCardUrl,
+    external: true,
+  },
+  {
+    type: "dropdown",
+    label: "About",
+    items: [
+      { label: "FAQs", href: "/faqs" },
+      { label: "About Us", href: "/about-us" },
+    ],
+  },
+  { type: "link", label: "Gallery", href: "/gallery" },
+  { type: "link", label: "Reservation", href: "/reservation" },
+  { type: "link", label: "News", href: "/news" },
+  { type: "link", label: "Contact", href: "/contact" },
 ];
+
+export function flattenNav(items: NavItem[] = nav): NavLink[] {
+  return items.flatMap((item) => {
+    if (item.type === "link") {
+      return [{ label: item.label, href: item.href, external: item.external }];
+    }
+
+    const parent = item.href
+      ? [{ label: item.label, href: item.href }]
+      : [];
+    return [...parent, ...item.items];
+  });
+}
 
 export const galleryImages = Array.from({ length: 36 }, (_, i) => {
   const n = String(i + 1).padStart(2, "0");

@@ -4,14 +4,74 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { nav, site } from "@/lib/site";
+import { nav, site, type NavItem, type NavLink } from "@/lib/site";
+
+function isActive(pathname: string, href: string) {
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function isNavItemActive(pathname: string, item: NavItem) {
+  if (item.type === "link") {
+    return !item.external && isActive(pathname, item.href);
+  }
+
+  if (item.href && isActive(pathname, item.href)) {
+    return true;
+  }
+
+  return item.items.some((child) => isActive(pathname, child.href));
+}
+
+function NavAnchor({
+  link,
+  className,
+  onNavigate,
+}: {
+  link: NavLink;
+  className: string;
+  onNavigate?: () => void;
+}) {
+  if (link.external) {
+    return (
+      <a
+        href={link.href}
+        target="_blank"
+        rel="noreferrer"
+        className={className}
+        onClick={onNavigate}
+      >
+        {link.label}
+      </a>
+    );
+  }
+
+  return (
+    <Link href={link.href} className={className} onClick={onNavigate}>
+      {link.label}
+    </Link>
+  );
+}
+
+function Caret({ open }: { open?: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 10 6"
+      aria-hidden="true"
+      className={`h-2 w-2 fill-current transition-transform ${open ? "rotate-180" : ""}`}
+    >
+      <path d="M0 0l5 6 5-6z" />
+    </svg>
+  );
+}
 
 export function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [expanded, setExpanded] = useState<string | null>(null);
 
   useEffect(() => {
     setOpen(false);
+    setExpanded(null);
   }, [pathname]);
 
   useEffect(() => {
@@ -20,6 +80,11 @@ export function Header() {
       document.body.style.overflow = "";
     };
   }, [open]);
+
+  const linkClass = (active: boolean) =>
+    `inline-flex items-center gap-1 px-2.5 py-2 text-[11px] font-medium uppercase tracking-[0.14em] transition-colors hover:text-white/70 ${
+      active ? "text-white" : "text-white/90"
+    }`;
 
   return (
     <header className="sticky top-0 z-50 bg-navy text-white shadow-[0_5px_10px_rgba(0,0,0,0.1)]">
@@ -36,18 +101,54 @@ export function Header() {
 
         <nav className="hidden items-center xl:flex">
           {nav.map((item) => {
-            const active =
-              pathname === item.href || pathname.startsWith(`${item.href}/`);
+            if (item.type === "link") {
+              return (
+                <NavAnchor
+                  key={item.label}
+                  link={item}
+                  className={linkClass(isNavItemActive(pathname, item))}
+                />
+              );
+            }
+
+            const active = isNavItemActive(pathname, item);
+
             return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`px-2.5 py-2 text-[11px] font-medium uppercase tracking-[0.14em] transition-colors hover:text-white/70 ${
-                  active ? "text-white" : "text-white/90"
-                }`}
-              >
-                {item.label}
-              </Link>
+              <div key={item.label} className="group relative">
+                {item.href ? (
+                  <Link
+                    href={item.href}
+                    className={`${linkClass(active)} after:absolute after:bottom-1 after:left-2.5 after:h-px after:w-0 after:bg-white after:transition-all group-hover:after:w-[calc(100%-1.25rem)]`}
+                  >
+                    {item.label}
+                    <Caret />
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    className={linkClass(active)}
+                    aria-haspopup="true"
+                  >
+                    {item.label}
+                    <Caret />
+                  </button>
+                )}
+
+                <div className="invisible absolute top-full left-0 min-w-[200px] pt-2 opacity-0 transition-all group-hover:visible group-hover:opacity-100">
+                  <ul className="border border-black/5 bg-white py-2 shadow-lg">
+                    {item.items.map((child) => (
+                      <li key={child.href}>
+                        <NavAnchor
+                          link={child}
+                          className={`block px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.14em] text-black transition-colors hover:bg-black/5 hover:text-navy ${
+                            isActive(pathname, child.href) ? "text-navy" : ""
+                          }`}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
             );
           })}
         </nav>
@@ -90,15 +191,51 @@ export function Header() {
       {open ? (
         <div className="fixed inset-x-0 top-[72px] bottom-0 z-40 overflow-y-auto bg-navy xl:hidden">
           <nav className="flex flex-col px-6 py-6">
-            {nav.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="border-b border-white/15 py-4 text-sm font-medium uppercase tracking-[0.16em]"
-              >
-                {item.label}
-              </Link>
-            ))}
+            {nav.map((item) => {
+              if (item.type === "link") {
+                return (
+                  <NavAnchor
+                    key={item.label}
+                    link={item}
+                    onNavigate={() => setOpen(false)}
+                    className="border-b border-white/15 py-4 text-sm font-medium uppercase tracking-[0.16em]"
+                  />
+                );
+              }
+
+              const isExpanded = expanded === item.label;
+
+              return (
+                <div key={item.label} className="border-b border-white/15">
+                  <button
+                    type="button"
+                    className="flex w-full items-center justify-between py-4 text-left text-sm font-medium uppercase tracking-[0.16em]"
+                    aria-expanded={isExpanded}
+                    onClick={() =>
+                      setExpanded((current) =>
+                        current === item.label ? null : item.label,
+                      )
+                    }
+                  >
+                    <span>{item.label}</span>
+                    <Caret open={isExpanded} />
+                  </button>
+                  {isExpanded ? (
+                    <ul className="pb-3 pl-4">
+                      {item.items.map((child) => (
+                        <li key={child.href}>
+                          <NavAnchor
+                            link={child}
+                            onNavigate={() => setOpen(false)}
+                            className="block py-2 text-sm text-white/80 uppercase tracking-[0.14em]"
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
+              );
+            })}
             <a
               href={site.phoneHref}
               className="mt-6 border border-white px-4 py-3 text-center text-xs uppercase tracking-[0.16em]"

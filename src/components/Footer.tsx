@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { nav, site } from "@/lib/site";
+import { flattenNav, site } from "@/lib/site";
 
 export function Footer() {
   return (
@@ -70,11 +70,29 @@ export function Footer() {
         <div className="mx-auto flex max-w-[1440px] flex-col gap-4 px-5 py-6 text-[11px] uppercase tracking-[0.14em] text-white/60 lg:flex-row lg:items-center lg:justify-between lg:px-8">
           <p>© {new Date().getFullYear()} Nail Monster</p>
           <div className="flex flex-wrap gap-x-4 gap-y-2">
-            {nav.slice(0, 6).map((item) => (
-              <Link key={item.href} href={item.href} className="hover:text-white">
-                {item.label}
-              </Link>
-            ))}
+            {flattenNav()
+              .slice(0, 8)
+              .map((item) =>
+                item.external ? (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hover:text-white"
+                  >
+                    {item.label}
+                  </a>
+                ) : (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="hover:text-white"
+                  >
+                    {item.label}
+                  </Link>
+                ),
+              )}
           </div>
         </div>
       </div>
