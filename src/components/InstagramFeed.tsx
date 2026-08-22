@@ -1,8 +1,24 @@
-import Image from "next/image";
-import { galleryImages, site } from "@/lib/site";
-import type { InstagramPost } from "@/lib/instagram";
+"use client";
 
-export function InstagramFeed({ posts }: { posts: InstagramPost[] }) {
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import { fetchInstagramPosts, type InstagramPost } from "@/lib/instagram";
+import { galleryImages, site } from "@/lib/site";
+
+export function InstagramFeed() {
+  const [posts, setPosts] = useState<InstagramPost[]>([]);
+
+  useEffect(() => {
+    const feedId = process.env.NEXT_PUBLIC_BEHOLD_FEED_ID;
+    if (!feedId) return;
+
+    fetchInstagramPosts(feedId, 6)
+      .then(setPosts)
+      .catch((error) => {
+        console.error("Instagram feed error", error);
+      });
+  }, []);
+
   const items =
     posts.length > 0
       ? posts.map((post) => ({
@@ -46,7 +62,6 @@ export function InstagramFeed({ posts }: { posts: InstagramPost[] }) {
               className="relative aspect-square overflow-hidden"
             >
               {item.remote ? (
-                // Instagram CDN hosts change; skip the optimizer for remote posts.
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={item.src}

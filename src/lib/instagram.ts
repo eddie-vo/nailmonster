@@ -11,53 +11,45 @@ type BeholdPost = {
   mediaUrl?: string;
   thumbnailUrl?: string;
   caption?: string;
-  mediaType?: string;
   sizes?: {
     small?: { mediaUrl?: string };
     medium?: { mediaUrl?: string };
   };
 };
 
-export async function getInstagramPosts(
+function parseBeholdPosts(payload: unknown): BeholdPost[] {
+  return Array.isArray(payload)
+    ? payload
+    : ((payload as { posts?: BeholdPost[] }).posts ?? []);
+}
+
+export function mapBeholdPosts(posts: BeholdPost[], limit = 6): InstagramPost[] {
+  return posts
+    .map((post) => ({
+      id: post.id,
+      permalink: post.permalink,
+      imageUrl:
+        post.sizes?.medium?.mediaUrl ||
+        post.sizes?.small?.mediaUrl ||
+        post.thumbnailUrl ||
+        post.mediaUrl ||
+        "",
+      caption: post.caption,
+    }))
+    .filter((post) => post.imageUrl)
+    .slice(0, limit);
+}
+
+export async function fetchInstagramPosts(
+  feedId: string,
   limit = 6,
 ): Promise<InstagramPost[]> {
-  const feedId = process.env.BEHOLD_FEED_ID;
+  const response = await fetch(`https://feeds.behold.so/${feedId}`);
 
-  if (!feedId) {
-    return [];
+  if (!response.ok) {
+    throw new Error(`Behold feed failed: ${response.status}`);
   }
 
-  try {
-    const response = await fetch(`https://feeds.behold.so/${feedId}`, {
-      next: { revalidate: 3600 },
-    });
-
-    if (!response.ok) {
-      console.error("Behold feed failed", response.status);
-      return [];
-    }
-
-    const payload: unknown = await response.json();
-    const rawPosts = Array.isArray(payload)
-      ? payload
-      : ((payload as { posts?: BeholdPost[] }).posts ?? []);
-
-    return rawPosts
-      .map((post: BeholdPost) => ({
-        id: post.id,
-        permalink: post.permalink,
-        imageUrl:
-          post.sizes?.medium?.mediaUrl ||
-          post.sizes?.small?.mediaUrl ||
-          post.thumbnailUrl ||
-          post.mediaUrl ||
-          "",
-        caption: post.caption,
-      }))
-      .filter((post) => post.imageUrl)
-      .slice(0, limit);
-  } catch (error) {
-    console.error("Behold feed error", error);
-    return [];
-  }
+  const payload: unknown = await response.json();
+  return mapBeholdPosts(parseBeholdPosts(payload), limit);
 }

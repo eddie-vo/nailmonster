@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { CallButton } from "@/components/CallButton";
 import { InstagramFeed } from "@/components/InstagramFeed";
-import { getInstagramPosts } from "@/lib/instagram";
 import { site } from "@/lib/site";
 
 const services = [
@@ -23,9 +22,7 @@ const services = [
   },
 ];
 
-export default async function Home() {
-  const instagramPosts = await getInstagramPosts(6);
-
+export default function Home() {
   return (
     <>
       <section className="relative min-h-[88vh] overflow-hidden">
@@ -190,7 +187,7 @@ export default async function Home() {
         ))}
       </section>
 
-      <InstagramFeed posts={instagramPosts} />
+      <InstagramFeed />
     </>
   );
 }
