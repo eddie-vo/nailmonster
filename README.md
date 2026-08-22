@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Nail Monster
 
-## Getting Started
+A recreation of [nailmonster.co](https://nailmonster.co) — an upscale Japanese and Korean nail salon in Brookline, MA.
 
-First, run the development server:
+## Pages
+
+- Home
+- About Us
+- Gallery
+- Price List
+- Nail Services (manicure / pedicure)
+- Eyelash / Wax
+- Facial Spa
+- FAQs
+- Reservation
+- News
+- Contact
+
+## Develop
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Instagram feed
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The homepage can show a live [@nailmonsterboston](https://www.instagram.com/nailmonsterboston/) grid. Instagram does not allow public scraping, so the site uses [Behold](https://behold.so).
 
-## Learn More
+1. Create a free Behold account and connect the salon Instagram.
+2. Copy the feed ID from the Behold dashboard.
+3. Add it to `.env.local`:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+BEHOLD_FEED_ID=your-feed-id
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+4. Restart `npm run dev`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Until that ID is set, the section falls back to local gallery photos.
