@@ -86,7 +86,7 @@ export function flattenNav(items: NavItem[] = nav): NavLink[] {
   });
 }
 
-export const galleryImages = Array.from({ length: 36 }, (_, i) => {
-  const n = String(i + 1).padStart(2, "0");
+export const galleryImages = Array.from({ length: 114 }, (_, i) => {
+  const n = String(i + 1).padStart(3, "0");
   return `/images/gallery/${n}.jpg`;
 });
