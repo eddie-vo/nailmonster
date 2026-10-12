@@ -25,57 +25,85 @@ const services = [
 export default function Home() {
   return (
     <>
-      <section className="relative min-h-[88vh] overflow-hidden">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/hero.jpg"
-            alt="Japanese nail art at Nail Monster"
-            fill
-            priority
-            className="object-cover object-right"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-white via-white/92 to-white/20" />
-        </div>
-        <div className="relative mx-auto flex min-h-[88vh] max-w-[1440px] items-center px-5 py-20 lg:px-12">
-          <div className="max-w-xl">
-            <p className="mb-4 text-[13px] font-medium uppercase tracking-[0.28em] text-navy">
-              Brookline, MA
-            </p>
-            <div className="relative mb-8 h-16 w-[280px] sm:h-20 sm:w-[340px]">
-              <Image
-                src="/images/monster.png"
-                alt="Nail Monster"
-                fill
-                className="object-contain object-left"
-                priority
-              />
+      <section className="relative overflow-hidden bg-white">
+        <div className="mx-auto grid min-h-[88vh] max-w-[1440px] items-center lg:grid-cols-[49%_51%]">
+          <div className="relative z-10 px-5 py-16 sm:px-8 lg:py-20 lg:pr-24 lg:pl-12">
+            <h1 className="sr-only">Nail Monster</h1>
+            <Image
+              src="/images/nail.png"
+              alt=""
+              width={628}
+              height={235}
+              priority
+              className="mb-2 h-auto w-[52%] max-w-[300px] mix-blend-multiply"
+            />
+            <Image
+              src="/images/monster.png"
+              alt=""
+              width={1272}
+              height={247}
+              priority
+              className="mb-5 h-auto w-full max-w-[590px] mix-blend-multiply"
+            />
+            <CallButton invertHover className="mb-12 w-full sm:w-auto" />
+            <div className="grid grid-cols-[40%_60%] items-center sm:grid-cols-[44%_56%]">
+              <div className="flex items-center gap-2.5 pr-3">
+                <span className="text-[10px] font-bold uppercase sm:text-[14px]">
+                  Follow Us
+                </span>
+                <span className="h-px flex-1 bg-black" />
+              </div>
+              <div className="flex items-center gap-4 pl-3">
+                <a
+                  href={site.instagram}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Instagram"
+                  className="transition-colors hover:text-[#B4B4B4]"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="h-[14px] w-[14px]"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    aria-hidden="true"
+                  >
+                    <rect x="3" y="3" width="18" height="18" rx="5" />
+                    <circle cx="12" cy="12" r="4" />
+                    <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+                  </svg>
+                </a>
+                <a
+                  href={site.facebook}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Facebook"
+                  className="transition-colors hover:text-[#B4B4B4]"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="h-[14px] w-[14px]"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path d="M12 2a10 10 0 0 0-1.56 19.88v-7H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v7A10 10 0 0 0 12 2z" />
+                  </svg>
+                </a>
+              </div>
             </div>
-            <h1 className="page-title mb-6 text-[34px] leading-[1.05] md:text-[52px]">
-              For beautiful nails and a friendly smile
-            </h1>
-            <CallButton invertHover className="mb-10" />
-            <div className="flex items-center gap-5">
-              <span className="text-[12px] font-bold uppercase tracking-[0.18em]">
-                Follow Us
-              </span>
-              <span className="h-px w-16 bg-black" />
-              <a
-                href={site.instagram}
-                target="_blank"
-                rel="noreferrer"
-                className="text-[12px] uppercase tracking-[0.16em] hover:text-muted"
-              >
-                Instagram
-              </a>
-              <a
-                href={site.facebook}
-                target="_blank"
-                rel="noreferrer"
-                className="text-[12px] uppercase tracking-[0.16em] hover:text-muted"
-              >
-                Facebook
-              </a>
-            </div>
+          </div>
+
+          <div className="relative min-h-[260px] self-stretch lg:min-h-full">
+            <Image
+              src="/images/hero.jpg"
+              alt="Japanese nail art at Nail Monster"
+              fill
+              priority
+              sizes="(max-width: 1024px) 100vw, 51vw"
+              className="object-cover object-right"
+            />
+            <div className="absolute inset-0 bg-[linear-gradient(87deg,#ffffff_1%,rgba(255,255,255,0.23)_53%)]" />
           </div>
         </div>
       </section>
