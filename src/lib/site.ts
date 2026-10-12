@@ -67,7 +67,7 @@ export const nav: NavItem[] = [
 ];
 
 export function flattenNav(items: NavItem[] = nav): NavLink[] {
-  return items.flatMap((item) => {
+  const links = items.flatMap((item) => {
     if (item.type === "link") {
       return [{ label: item.label, href: item.href, external: item.external }];
     }
@@ -76,6 +76,13 @@ export function flattenNav(items: NavItem[] = nav): NavLink[] {
       ? [{ label: item.label, href: item.href }]
       : [];
     return [...parent, ...item.items];
+  });
+
+  const seen = new Set<string>();
+  return links.filter((link) => {
+    if (seen.has(link.href)) return false;
+    seen.add(link.href);
+    return true;
   });
 }
 
